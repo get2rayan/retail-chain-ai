@@ -7,7 +7,7 @@ products_file = os.getenv('STORE_PRODUCTS_FILE')
 
 class StoreProducts:
     """
-    Deal with operations for reading the store and product info from the products file
+    methods for reading the store and product info from the products file
     """
     def __init__(self):
         self.df = None
@@ -27,7 +27,6 @@ class StoreProducts:
         """
         try:
             if self.df is None:
-                ## path for notebook file - .pynb
                 # directory of current notebook        
                 current_dir = os.path.abspath('')
                 # full file path
@@ -38,7 +37,36 @@ class StoreProducts:
             print(e)
             pass
 
-if __name__ == "__main__":
-    sp = StoreProducts()
-    print(sp.available_products.head(5))
 
+    def get_store_products(self, product_name=None, storeid=None):
+        """
+        filter the store and product list for the specific product name
+        
+        Parameter(s):
+        product_name: name of the product to look for in a store (if specified)
+        storeid : integer representing a store (if specified)
+        
+        Returns:
+        product details for the requested product as dictionary
+        """
+        print (f"get_store_products argument received : {product_name} ,  {storeid}")
+        sp = self.available_products
+        # print (f"product is : {product_name} storeid is {storeid}")
+        if not sp.empty:
+            try:
+                if storeid is not None and int(storeid)>0:
+                    sp = sp.query(f'store=={storeid}')
+            except ValueError:
+                pass
+            if product_name:
+                sp = sp.query(f'product=="{product_name}"')
+            return sp.to_dict('records')
+        else:
+            return None
+    
+#####
+# local Validation
+if __name__ == "__main__":
+    sp = StoreProducts
+    print(sp.get_store_products("", 21))
+#####

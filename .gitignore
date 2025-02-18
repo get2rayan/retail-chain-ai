@@ -14,3 +14,5 @@ env/
 *.user
 *.sln
 *.userprefs
+# notebook files
+notebooks/
