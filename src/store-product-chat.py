@@ -75,6 +75,9 @@ class StoreProductChat:
         Returns:
         response: response message for the tool call invocation
         """
+        # list to store tool call response
+        tool_results = []
+
         for item in message.tool_calls:
             function_entry = [ func for func in self.tool_functions if 'name' in func and func['name']==item.function.name]
             function = function_entry[0].get('function')
@@ -90,12 +93,13 @@ class StoreProductChat:
                     print(f"Error: function not configured - {item.function.name}")
                     product_info = "unknown"
                     
-            response = {
+            tool_results.append({
                 "role": "tool",
                 "content": json.dumps({"product_info": product_info}),
                 "tool_call_id": item.id
-            }
-            return response
+            })
+
+        return tool_results
         
 
     def chat(self, message, history):
@@ -117,15 +121,14 @@ class StoreProductChat:
         # If tool_call specified, invoke custom tool call function
         if response.choices[0].finish_reason=="tool_calls":
             print(f"handle_tool_call invoked for prompt : {message}")
-            print(response.choices[0].message)
             message = response.choices[0].message
             # tool call method invocation
             response = self.handle_tool_call(message)
             tool_call_response = response
             messages.append(message)
-            messages.append(response)
+            messages +=response
             response = self.openai.chat.completions.create(model = self.MODEL, messages=messages)
-                            
+            
         return response.choices[0].message.content, tool_call_response
 
 #####    
@@ -150,18 +153,18 @@ class StoreProductChat:
         response, toolCallResponse = self.chat(message, history)
         image = None
         
-        if toolCallResponse is not None and toolCallResponse.get('content') is not None:
-            content_str=toolCallResponse.get('content')
-            product_info = json.loads(content_str)['product_info']
-            print(f"product_info : {product_info}")
-            
-            if product_info !='unknown':
+        if toolCallResponse is not None and toolCallResponse[0].get('content') is not None:
+            content_str=toolCallResponse[0].get('content')
+            if content_str and json.loads(content_str).get('product_info'):
+                product_info = json.loads(content_str).get('product_info')
                 
-                # Get the product items from the list of dictionary
-                product_items= [item.get('product') for item in product_info if item.get('product')]
+                if product_info !='unknown':
+                    
+                    # Get the product items from the list of dictionary
+                    product_items= [item.get('product') for item in product_info if item.get('product')]
 
-                # Invoke image generation AI method
-                image = PictureAgent().generateImage(product_items)
+                    # Invoke image generation AI method
+                    image = PictureAgent().generateImage(product_items)
         
         history += [{"role": "user", "content": message}, {"role": "assistant", "content": response}]
         return "", history, image
