@@ -122,15 +122,16 @@ class StoreProductChat:
 
         # If tool_call specified, invoke custom tool call function
         if response.choices[0].finish_reason=="tool_calls":
-            print(f"handle_tool_call invoked for prompt : {message}")
+            print(f"\nhandle_tool_call invoked for prompt : {message}")
+            print(f"\nai response to invoke tool_call : {response}")
             message = response.choices[0].message
             # tool call method invocation
             response = self.handle_tool_call(message)
             tool_call_response = response
+            print(f"\ntool call response : {response}")
             messages.append(message)
             messages +=response
             response = self.openai.chat.completions.create(model = self.MODEL, messages=messages)
-            print(f"\nai tool call resp message: {response.choices[0].message}")
             
         print(f"\nai response : {response}")
         return response.choices[0].message.content, tool_call_response
