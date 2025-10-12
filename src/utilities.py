@@ -1,5 +1,8 @@
 import os
+from dotenv import load_dotenv
 import pandas as pd
+
+load_dotenv()
 
 # csv file that has the store and products info such as
 # the storeid, product name, price and promotion details
@@ -34,7 +37,7 @@ class StoreProducts:
                 self.df = pd.read_csv(file_path, header=0)                    
             return self.df
         except Exception as e:
-            print(e)
+            print(f"Error loading store products: {e}")
             pass
 
 
@@ -49,24 +52,29 @@ class StoreProducts:
         Returns:
         product details for the requested product as dictionary
         """
-        print (f"get_store_products argument received : {product_name} ,  {storeid}")
+        print (f"\nget_store_products argument received : {product_name} ,  {storeid}")
         sp = self.available_products
         # print (f"product is : {product_name} storeid is {storeid}")
-        if not sp.empty:
-            try:
-                if storeid is not None and int(storeid)>0:
-                    sp = sp.query(f'store=={storeid}')
-            except ValueError:
-                pass
-            if product_name:
-                sp = sp.query(f'product=="{product_name}"')
-            return sp.to_dict('records')
-        else:
-            return None
+        try:
+            if not sp.empty:
+                try:
+                    if storeid is not None and int(storeid)>0:
+                        sp = sp.query(f'store=={storeid}')
+                except ValueError:
+                    pass
+                if product_name:
+                    sp = sp.query(f'product=="{product_name}"')
+                return sp.to_dict('records')
+            else:
+                return None
+        except Exception as e:
+            print(f"Error getting store products: {e}")
+            pass
+
     
 #####
 # local Validation
 if __name__ == "__main__":
-    sp = StoreProducts
+    sp = StoreProducts()
     print(sp.get_store_products("", 21))
 #####
