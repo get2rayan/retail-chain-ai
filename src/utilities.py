@@ -30,10 +30,12 @@ class StoreProducts:
         """
         try:
             if self.df is None:
-                # directory of current notebook        
-                current_dir = os.path.abspath('')
+                # Get the directory where this script is located
+                script_dir = os.path.dirname(os.path.abspath(__file__))
+                # Go up one level to the parent directory, then into data folder
+                parent_dir = os.path.dirname(script_dir)
                 # full file path
-                file_path = os.path.join(current_dir, 'data', products_file)
+                file_path = os.path.join(parent_dir, 'data', products_file)
                 self.df = pd.read_csv(file_path, header=0)                    
             return self.df
         except Exception as e:
