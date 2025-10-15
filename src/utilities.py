@@ -40,30 +40,32 @@ class StoreProducts:
             print(f"Error loading store products: {e}")
             pass
 
-
-    def get_store_products(self, product_name=None, storeid=None):
+    def get_store_products(self, product_name=None, store_id=None, department=None):
         """
         filter the store and product list for the specific product name
         
         Parameter(s):
         product_name: name of the product to look for in a store (if specified)
-        storeid : integer representing a store (if specified)
+        store_id : integer representing a store (if specified)
+        department: department in the store (if specified)
         
         Returns:
         product details for the requested product as dictionary
         """
-        print (f"\nget_store_products argument received : {product_name} ,  {storeid}")
+        print (f"\nget_store_products argument received : product {product_name} , store {store_id}, department {department}")
         sp = self.available_products
         # print (f"product is : {product_name} storeid is {storeid}")
         try:
             if not sp.empty:
                 try:
-                    if storeid is not None and int(storeid)>0:
-                        sp = sp.query(f'store=={storeid}')
+                    if store_id is not None and int(store_id)>0:
+                        sp = sp.query(f'store=={store_id}')
                 except ValueError:
                     pass
                 if product_name:
-                    sp = sp.query(f'product=="{product_name}"')
+                    sp = sp.query(f'product.str.contains("{product_name}", case=False)', engine='python')
+                if department:
+                    sp = sp.query(f'department.str.contains("{department}", case=False)', engine='python')
                 return sp.to_dict('records')
             else:
                 return None
@@ -76,5 +78,5 @@ class StoreProducts:
 # local Validation
 if __name__ == "__main__":
     sp = StoreProducts()
-    print(sp.get_store_products("", 21))
+    print(sp.get_store_products("", 21, "Meat"))
 #####
