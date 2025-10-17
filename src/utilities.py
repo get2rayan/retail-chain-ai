@@ -80,5 +80,5 @@ class StoreProducts:
 # local Validation
 if __name__ == "__main__":
     sp = StoreProducts()
-    print(sp.get_store_products("", 21, "Meat"))
+    print(sp.get_store_products("milk"))
 #####
