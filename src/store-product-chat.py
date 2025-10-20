@@ -21,16 +21,15 @@ class StoreProductChat:
 
         self.setupAiTools()
 
-
     def setupAiTools(self):
         """
         initialize the attributes necessary for ai interaction
         """
         products_tool={
             "name": "get_store_products",
-            "description": "Get the details of the product and/or store requested by the user. Call this whenever you need to know the product availability, \
+            "description": "Get the details of the product and/or store and/or department requested by the user. Call this whenever you need to know the product availability, \
                   price or to check what products are available in a specific store or which items are in promotion, for example when a customer asks 'do you have this product' or \
-                    'what is the price of this product' or 'is this product available' or 'which stores have this product available'",
+                    'what is the price of this product' or 'is this product available' or 'which stores have this product available' or 'what products are available in the produce department' or 'which items are in promotion in store 101'.",
             "parameters": {
                 "type": "object",
                 "properties": {
@@ -41,29 +40,28 @@ class StoreProductChat:
                     "store_id": {
                         "type": "integer",
                         "description": "The store that the customer wants details about"
+                    },
+                    "department": {
+                        "type": "string",
+                        "description": "The department in the store that the customer wants details about"
                     }
                 },
-                "required": ["product_name", "store_id"],
+                "required": ["product_name", "store_id", "department"],
                 "additionalProperties": False
             }
         }
-
         self.tools = [{"type": "function", "function": products_tool}]
         self.tool_functions = [{"name": "get_store_products", "function": StoreProducts().get_store_products}]
-
         self.MODEL =self.openai_model
-
         self.system_message="""You are a helpful assistant for a retail store ordering system.
-        Customers may check with you for a list of available products in a store, their prices, availability or items that are in promotion at a store.
+        Customers may check with you for a list of available products in a store, their prices, availability or items that are in promotion at a store. Alternatively, they may also check for items in a specific department such as produce, deli etc.
         **Crucially, do not make any assumptions about products or stores unless explicitly specified by the user.**  If a product is not specified, do not substitute or guess a product; your tool calls should reflect the lack of product information.
         If a customer checks on a product without specifying a store, search the product in all available stores.
         Store information, if one provided is represented by a store number, which is an integer.
-        When making tool calls, ensure that the 'store' and 'product' fields are populated *only* if the user has explicitly provided that information.  **Do not fill these fields with default values or guesses.** Leave the fields empty (null or equivalent in your tool call structure) if the user has not provided the information.
-
+        When making tool calls, ensure that the 'store', 'product' or 'department' fields are populated *only* if the user has explicitly provided that information.  **Do not fill these fields with default values or guesses.** Leave the fields empty (null or equivalent in your tool call structure) if the user has not provided the information.
         Give short, courteous, and accurate answers. If you don't know the answer or lack the necessary information from the user, say so politely.
         """
         self.openai = OpenAI(api_key=self.openai_api_key)
-
 
     def handle_tool_call(self, message):
         """
@@ -87,8 +85,9 @@ class StoreProductChat:
                 case 'get_store_products':
                     product_name = arguments.get("product_name")
                     store_id = arguments.get("store_id")
+                    department = arguments.get("department")
 
-                    product_info = function(product_name, store_id)
+                    product_info = function(product_name, store_id, department)
                 case _:
                     print(f"Error: function not configured - {item.function.name}")
                     product_info = "unknown"
@@ -101,7 +100,6 @@ class StoreProductChat:
 
         return tool_results
         
-
     def chat(self, message, history):
         """
         method with signature appropriate to be used for Gradio chat interface
@@ -170,8 +168,7 @@ class StoreProductChat:
             if content_str and json.loads(content_str).get('product_info'):
                 product_info = json.loads(content_str).get('product_info')
                 
-                if product_info !='unknown':
-                    
+                if product_info !='unknown':                    
                     # Get the product items from the list of dictionary
                     product_items= [item.get('product') for item in product_info if item.get('product')]
 
@@ -180,7 +177,6 @@ class StoreProductChat:
                     image = PictureAgent().generateImage(product_items)
 
         return history, image
-
 
 # Validation for chatWithImage
 if __name__ == "__main__":
