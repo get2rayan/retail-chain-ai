@@ -1,4 +1,5 @@
 import os
+import sys
 from dotenv import load_dotenv
 import pandas as pd
 
@@ -14,6 +15,8 @@ class StoreProducts:
     """
     def __init__(self):
         self.df = None
+        # Check if running in MCP mode (no tty)
+        self.debug_mode = sys.stdout.isatty()
            
     @property
     def available_products(self):
@@ -30,45 +33,52 @@ class StoreProducts:
         """
         try:
             if self.df is None:
-                # directory of current notebook        
-                current_dir = os.path.abspath('')
+                # Get the directory where this script is located
+                script_dir = os.path.dirname(os.path.abspath(__file__))
+                # Go up one level to the parent directory, then into data folder
+                parent_dir = os.path.dirname(script_dir)
                 # full file path
-                file_path = os.path.join(current_dir, 'data', products_file)
+                file_path = os.path.join(parent_dir, 'data', products_file)
                 self.df = pd.read_csv(file_path, header=0)                    
             return self.df
         except Exception as e:
-            print(f"Error loading store products: {e}")
+            if self.debug_mode:
+                print(f"Error loading store products: {e}")
             pass
 
 
-    def get_store_products(self, product_name=None, storeid=None):
+    def get_store_products(self, product_name=None, store_id=None, department=None):
         """
         filter the store and product list for the specific product name
         
         Parameter(s):
         product_name: name of the product to look for in a store (if specified)
-        storeid : integer representing a store (if specified)
+        store_id : integer representing a store (if specified)
+        department: department in the store (if specified)
         
         Returns:
         product details for the requested product as dictionary
         """
-        print (f"\nget_store_products argument received : {product_name} ,  {storeid}")
-        sp = self.available_products
-        # print (f"product is : {product_name} storeid is {storeid}")
+        if self.debug_mode:
+            print (f"\nget_store_products argument received : product {product_name} , store {store_id}, department {department}")
+        sp = self.available_products        
         try:
             if not sp.empty:
                 try:
-                    if storeid is not None and int(storeid)>0:
-                        sp = sp.query(f'store=={storeid}')
+                    if store_id is not None and int(store_id)>0:
+                        sp = sp.query(f'store=={store_id}')
                 except ValueError:
                     pass
                 if product_name:
-                    sp = sp.query(f'product=="{product_name}"')
+                    sp = sp.query(f'product.str.contains("{product_name}", case=False)', engine='python')
+                if department:
+                    sp = sp.query(f'department.str.contains("{department}", case=False)', engine='python')
                 return sp.to_dict('records')
             else:
                 return None
         except Exception as e:
-            print(f"Error getting store products: {e}")
+            if self.debug_mode:
+                print(f"Error getting store products: {e}")
             pass
 
     
@@ -76,5 +86,5 @@ class StoreProducts:
 # local Validation
 if __name__ == "__main__":
     sp = StoreProducts()
-    print(sp.get_store_products("", 21))
+    print(sp.get_store_products("milk"))
 #####
