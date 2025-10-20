@@ -1,4 +1,5 @@
 import json
+import sys
 from mcp.server.fastmcp import FastMCP
 from utilities import StoreProducts
 
@@ -19,11 +20,17 @@ def get_store_product_info(product_name:str=None, store_id:int=None, department:
     return json.dumps({"product_info": product_info})
 
 def main():
-    mcp.run(transport='stdio')
+    # Only run test if not in MCP mode
+    if len(sys.argv) > 1 and sys.argv[1] == "test":
+        test()
+    else:
+        # Start MCP server without any print statements
+        mcp.run(transport='stdio')
 
-# def test():
-#     print (get_store_product_info("milk"))
+def test():
+    print("Testing get_store_product_info tool...")
+    print (get_store_product_info("milk"))
 
 if __name__ == "__main__":
-    main()
+    main()    
     

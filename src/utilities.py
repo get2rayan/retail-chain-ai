@@ -1,4 +1,5 @@
 import os
+import sys
 from dotenv import load_dotenv
 import pandas as pd
 
@@ -14,6 +15,8 @@ class StoreProducts:
     """
     def __init__(self):
         self.df = None
+        # Check if running in MCP mode (no tty)
+        self.debug_mode = sys.stdout.isatty()
            
     @property
     def available_products(self):
@@ -39,8 +42,10 @@ class StoreProducts:
                 self.df = pd.read_csv(file_path, header=0)                    
             return self.df
         except Exception as e:
-            print(f"Error loading store products: {e}")
+            if self.debug_mode:
+                print(f"Error loading store products: {e}")
             pass
+
 
     def get_store_products(self, product_name=None, store_id=None, department=None):
         """
@@ -54,9 +59,9 @@ class StoreProducts:
         Returns:
         product details for the requested product as dictionary
         """
-        print (f"\nget_store_products argument received : product {product_name} , store {store_id}, department {department}")
-        sp = self.available_products
-        # print (f"product is : {product_name} storeid is {storeid}")
+        if self.debug_mode:
+            print (f"\nget_store_products argument received : product {product_name} , store {store_id}, department {department}")
+        sp = self.available_products        
         try:
             if not sp.empty:
                 try:
@@ -72,7 +77,8 @@ class StoreProducts:
             else:
                 return None
         except Exception as e:
-            print(f"Error getting store products: {e}")
+            if self.debug_mode:
+                print(f"Error getting store products: {e}")
             pass
 
     
