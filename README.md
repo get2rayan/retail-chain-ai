@@ -66,6 +66,12 @@ STORE_PRODUCTS_FILE = "store_products.csv"
 ```
 
 ## Usage
+
+To install required packages:
+```
+pip install -r requirements.txt
+```
+
 To run the tool:
 ```
 cd src
@@ -74,3 +80,13 @@ python store-product-chat.py
 Navigate to the local `url` displayed and start chatting
 
 <img src="resources/run.png">
+
+### setup via uv
+If using uv as python package manager, run below command to restore packages from requirements.txt
+```
+uv pip install -r requirements.txt
+```
+and then to run the tool, use
+```
+uv run ./src/store-product-chat.py
+```
