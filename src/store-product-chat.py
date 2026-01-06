@@ -51,7 +51,8 @@ class StoreProductChat:
             }
         }
         self.tools = [{"type": "function", "function": products_tool}]
-        self.tool_functions = [{"name": "get_store_products", "function": StoreProducts().get_store_products}]
+        self.tool_functions = { "get_store_products": StoreProducts().get_store_products }
+
         self.MODEL =self.openai_model
         self.system_message="""You are a helpful assistant for a retail store ordering system.
         Customers may check with you for a list of available products in a store, their prices, availability or items that are in promotion at a store. Alternatively, they may also check for items in a specific department such as produce, deli etc.
@@ -63,12 +64,12 @@ class StoreProductChat:
         """
         self.openai = OpenAI(api_key=self.openai_api_key)
 
-    def handle_tool_call(self, message):
+    def handle_tool_call(self, tool_calls):
         """
         method to handle tool calls
 
         Parameter(s):
-        message: LLM message specifying a tool_call
+        tool_calls: LLM tool calls to be executed
 
         Returns:
         response: response message for the tool call invocation
@@ -76,26 +77,26 @@ class StoreProductChat:
         # list to store tool call response
         tool_results = []
 
-        for item in message.tool_calls:
-            function_entry = [ func for func in self.tool_functions if 'name' in func and func['name']==item.function.name]
-            function = function_entry[0].get('function')
-            arguments = json.loads(item.function.arguments)
+        for tool_call in tool_calls:
+            function = self.tool_functions.get(tool_call.function.name)
+            arguments = json.loads(tool_call.function.arguments)
+            product_info = function(**arguments) if function else {}
 
-            match item.function.name:
-                case 'get_store_products':
-                    product_name = arguments.get("product_name")
-                    store_id = arguments.get("store_id")
-                    department = arguments.get("department")
+            # match tool_call.function.name:
+            #     case 'get_store_products':
+            #         product_name = arguments.get("product_name")
+            #         store_id = arguments.get("store_id")
+            #         department = arguments.get("department")
 
-                    product_info = function(product_name, store_id, department)
-                case _:
-                    print(f"Error: function not configured - {item.function.name}")
-                    product_info = "unknown"
+            #         product_info = function(product_name, store_id, department)
+            #     case _:
+            #         print(f"Error: function not configured - {tool_call.function.name}")
+            #         product_info = "unknown"
                     
             tool_results.append({
                 "role": "tool",
                 "content": json.dumps({"product_info": product_info}),
-                "tool_call_id": item.id
+                "tool_call_id": tool_call.id
             })
 
         return tool_results
@@ -124,7 +125,7 @@ class StoreProductChat:
             print(f"\nai response to invoke tool_call : {response}")
             message = response.choices[0].message
             # tool call method invocation
-            response = self.handle_tool_call(message)
+            response = self.handle_tool_call(message.tool_calls)
             tool_call_response = response
             print(f"\ntool call response : {response}")
             messages.append(message)
