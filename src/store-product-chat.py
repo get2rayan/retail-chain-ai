@@ -1,5 +1,6 @@
 import os
 import json
+import sys
 from dotenv import load_dotenv
 from openai import OpenAI
 import gradio as gr
@@ -13,6 +14,8 @@ class StoreProductChat:
     def __init__(self):
         # Initialization
         load_dotenv()
+        self.debug_mode = sys.stdout.isatty()
+        
         self.openai_api_key = os.getenv('OPENAI_API_KEY')
         self.openai_model = os.getenv('OPENAI_MODEL')
 
