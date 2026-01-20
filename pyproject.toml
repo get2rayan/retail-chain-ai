@@ -3,7 +3,7 @@ name = "retail-chain-ai"
 version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
-requires-python = ">=3.14"
+requires-python = ">=3.13"
 dependencies = [
     "aiofiles==23.2.1",
     "annotated-doc==0.0.4",
@@ -36,8 +36,8 @@ dependencies = [
     "packaging==25.0",
     "pandas==2.2.3",
     "pillow==11.3.0",
-    "pydantic==2.12.5",
-    "pydantic-core==2.41.5",
+    "pydantic==2.10.6",
+    "pydantic-core==2.27.2",
     "pydub==0.25.1",
     "pygments==2.19.2",
     "python-dateutil==2.9.0.post0",
@@ -45,6 +45,7 @@ dependencies = [
     "python-multipart==0.0.21",
     "pytz==2025.2",
     "pyyaml==6.0.3",
+    "requests>=2.32.5",
     "rich==14.2.0",
     "ruff==0.14.10",
     "safehttpx==0.1.7",

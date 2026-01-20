@@ -180,7 +180,7 @@ if __name__ == "__main__":
 
     with gr.Blocks() as ui:
         with gr.Row():
-            chatbot = gr.Chatbot(height=500)
+            chatbot = gr.Chatbot(height=500, type='messages')
             image_output = gr.Image(height=500)
         with gr.Row():
             entry=gr.Textbox(label='Chat with our Store AI')        
