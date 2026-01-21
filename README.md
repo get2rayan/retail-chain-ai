@@ -1,3 +1,9 @@
+---
+title: retail-chain-ai
+app_file: src/store-product-chat.py
+sdk: gradio
+sdk_version: 5.16.0
+---
 <h1 align="center"># AI chat for Retail chain </h1>
 This is a baseline for an AI project / product for retail industry
 
