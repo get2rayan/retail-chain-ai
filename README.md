@@ -92,7 +92,12 @@ If using uv as python package manager, run below command to restore packages fro
 ```
 uv pip install -r requirements.txt
 ```
-and then to run the tool, use
+or if using the pyproject.toml file, below command can be used
+```
+uv sync
+```
+
+The application can be run using below command
 ```
 uv run ./src/store-product-chat.py
 ```
