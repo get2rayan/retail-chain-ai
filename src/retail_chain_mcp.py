@@ -28,8 +28,8 @@ def main():
         mcp.run(transport='stdio')
 
 def test():
-    print("Testing get_store_product_info tool...")
-    print (get_store_product_info("milk"))
+    print("Testing get_store_product_info tool...", file=sys.stderr)
+    print (get_store_product_info("milk"), file=sys.stderr)
 
 if __name__ == "__main__":
     main()    
