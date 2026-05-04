@@ -1,6 +1,6 @@
 import json
 import sys
-from mcp.server.fastmcp import FastMCP
+from fastmcp import FastMCP
 from utilities import StoreProducts
 
 mcp=FastMCP("retail-chain-mcp")
