@@ -46,7 +46,7 @@ class StoreProducts:
                 print(f"Error loading store products: {e}")
             pass
 
-
+    
     def get_store_products(self, product_name=None, store_id=None, department=None):
         """
         filter the store and product list for the specific product name

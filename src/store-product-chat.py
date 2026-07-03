@@ -160,18 +160,18 @@ class StoreProductChat:
         # initialize image object
         image = None
                 
-        if toolCallResponse is not None and toolCallResponse[0].get('content') is not None:
-            content_str=toolCallResponse[0].get('content')
-            if content_str and json.loads(content_str).get('product_info'):
-                product_info = json.loads(content_str).get('product_info')
-                
-                if product_info !='unknown':                    
-                    # Get the product items from the list of dictionary
-                    product_items= [item.get('product') for item in product_info if item.get('product')]
+        if "Image" in agent_list:                
+            if toolCallResponse is not None and toolCallResponse[0].get('content') is not None:
+                content_str=toolCallResponse[0].get('content')
+                if content_str and json.loads(content_str).get('product_info'):
+                    product_info = json.loads(content_str).get('product_info')
+                    
+                    if product_info !='unknown':                    
+                        # Get the product items from the list of dictionary
+                        product_items= [item.get('product') for item in product_info if item.get('product')]
 
-                # Invoke image generation AI method, if 'image' agent is selected
-                if "Image" in agent_list:
-                    image = PictureAgent().generateImage(product_items)
+                        # Invoke image generation AI method, if 'image' agent is selected
+                        image = PictureAgent().generateImage(product_items)
 
         return history, image
 
