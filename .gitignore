@@ -16,3 +16,6 @@ env/
 *.userprefs
 # notebook files
 notebooks/
+.claude/
+.gradio/
+.DS_Store

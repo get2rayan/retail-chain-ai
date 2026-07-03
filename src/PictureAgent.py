@@ -30,16 +30,15 @@ class PictureAgent:
         Returns:
         image content of the generated image
         """
-        prompt = f"""Generate a collage of product images for {', '.join(content)}.  The most important requirement is that *no product image should overlap any other* and show only the products mentioned.  \n
+        prompt = f"""Generate a collage of product images for the following items only -  {', '.join(content)}.  The most important requirement is that *no product image should overlap any other* and show only the products mentioned.  \n
                 Each item must be clearly visible and distinct. Arrange the images in a clean and organized manner, with sufficient spacing between them.  \n
                 The images should be high-quality and realistic, evoking the feeling of browsing in a store. The items should appear only once."""
         
         response=self.openai.images.generate(
-                model="dall-e-3",
+                model="gpt-image-1.5",
                 prompt = prompt,
                 size="1024x1024",
-                n=1,
-                response_format="b64_json"
+                n=1
             )
 
         image_base64 = response.data[0].b64_json
