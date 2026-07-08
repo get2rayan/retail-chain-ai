@@ -1,3 +1,4 @@
+from functools import lru_cache
 import os
 import sys
 from dotenv import load_dotenv
@@ -24,6 +25,7 @@ class StoreProducts:
             self.__load_store_products()
         return self.df
     
+    @lru_cache
     def __load_store_products(self): 
         """
         private method to read the product information file
