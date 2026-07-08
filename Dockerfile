@@ -4,8 +4,6 @@ FROM python:3.13-slim
 # Set working directory
 WORKDIR /app
 
-# Set environment variables if not copying .env file
-
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
     gcc \
@@ -27,5 +25,11 @@ RUN useradd --create-home --shell /bin/bash app && \
     chown -R app:app /app
 USER app
 
-# Default command to run the MCP server
-CMD ["python", "src/retail_chain_mcp.py"]
+# Expose Gradio's default hosting port
+EXPOSE 7860
+
+# Force Gradio to route via container's network interface
+ENV GRADIO_SERVER_NAME="0.0.0.0"
+
+# Default command to run the application
+CMD ["python", "src/store-product-chat.py"]
