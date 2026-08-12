@@ -2,6 +2,7 @@ import os
 from openai import OpenAI
 from dotenv import load_dotenv
 import base64
+from logger_config import logger
 from io import BytesIO
 from PIL import Image
 
@@ -15,7 +16,7 @@ class PictureAgent:
         load_dotenv()
         openai_api_key = os.getenv('OPENAI_API_KEY')
         if not openai_api_key:
-            print("OpenAI API Key not set")      
+            logger.warning("OpenAI API Key not set")
 
         self.openai = OpenAI(api_key=openai_api_key)
 
@@ -50,5 +51,6 @@ class PictureAgent:
 # local Validation
 if __name__=="__main__":
     image = PictureAgent().generateImage(["milk", "fish", "orange"])
+    logger.info("Generated image:")
     display(image)
 #####
