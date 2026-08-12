@@ -1,26 +1,26 @@
 import os
 import json
 import sys
+from logger_config import logger
 from dotenv import load_dotenv
 from openai import OpenAI
 import gradio as gr
 from PictureAgent import PictureAgent
 from utilities import StoreProducts
 
+load_dotenv()
+        
 class StoreProductChat:
     """
     interact with a chat interface about the store and product information
     """
     def __init__(self):
         # Initialization
-        load_dotenv()
-        self.debug_mode = sys.stdout.isatty()
-        
         self.openai_api_key = os.getenv('OPENAI_API_KEY')
         self.openai_model = os.getenv('OPENAI_MODEL')
 
         if not self.openai_api_key:
-            print("OpenAI API Key not set")
+            logger.warning("OpenAI API Key not set")
 
         self.setupAiTools()
 
@@ -66,6 +66,7 @@ class StoreProductChat:
         Give short, courteous, and accurate answers. If you don't know the answer or lack the necessary information from the user, say so politely.
         """
         self.openai = OpenAI(api_key=self.openai_api_key)
+        logger.debug(f"AI tools setup complete. Model: {self.MODEL}")
 
     def handle_tool_call(self, tool_calls):
         """
@@ -81,10 +82,12 @@ class StoreProductChat:
         tool_results = []
 
         for tool_call in tool_calls:
+            logger.debug(f"\nInvoking tool call: {tool_call.function.name} with arguments: {tool_call.function.arguments}")
             function = self.tool_functions.get(tool_call.function.name)
             arguments = json.loads(tool_call.function.arguments)
             product_info = function(**arguments) if function else {}
 
+            logger.debug(f"\nTool call result for {tool_call.function.name}: {product_info}")
             tool_results.append({
                 "role": "tool",
                 "content": json.dumps({"product_info": product_info}),
@@ -106,29 +109,24 @@ class StoreProductChat:
         toolCallResponse: indicator whether a tool_call was made
         """
         messages = [{"role": "system", "content": self.system_message}] + history
-        if self.debug_mode:
-            print(f"\nchat messages to ai : {history}")
+        logger.debug(f"\nchat messages to ai : {history}")
         response = self.openai.chat.completions.create(model=self.MODEL, messages=messages, tools=self.tools, tool_choice="auto")
             
         tool_call_response=None
 
         # If tool_call specified, invoke custom tool call function
         if response.choices[0].finish_reason=="tool_calls":
-            if self.debug_mode:
-                print(f"\nhandle_tool_call invoked for prompt : {message}")
-                print(f"\nai response to invoke tool_call : {response}")
+            logger.debug(f"\nai response to invoke tool_call : {response}")
             message = response.choices[0].message
             # tool call method invocation
             response = self.handle_tool_call(message.tool_calls)
             tool_call_response = response
-            if self.debug_mode:
-                print(f"\ntool call response : {response}")
+            logger.debug(f"\ntool call response : {response}")
             messages.append(message)
             messages +=response
             response = self.openai.chat.completions.create(model = self.MODEL, messages=messages)
             
-        if self.debug_mode:
-            print(f"\nai response : {response}")
+        logger.debug(f"\nai chat response : {response}")
         return response.choices[0].message.content, tool_call_response
 
 #####
@@ -199,4 +197,4 @@ if __name__ == "__main__":
 
         clear.click(lambda: None, inputs= None, outputs=chatbot, queue=False)
 
-    ui.queue().launch(inbrowser=True)
+    ui.queue().launch(inbrowser=True, debug=True)
