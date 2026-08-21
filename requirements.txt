@@ -101,7 +101,7 @@ httpx==0.28.1
     #   safehttpx
 httpx-sse==0.4.3
     # via mcp
-huggingface-hub==1.2.3
+huggingface-hub==1.5.0
     # via
     #   gradio
     #   gradio-client
