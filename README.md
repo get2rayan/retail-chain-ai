@@ -97,6 +97,33 @@ or if using the pyproject.toml file, below command can be used
 uv sync
 ```
 
+### Input guardrails
+
+The MCP and Gradio paths validate user-controlled search values before they
+reach the data layer or the LLM. The built-in checks detect common prompt
+injection phrases, mask email addresses, phone numbers, card numbers, SSNs,
+and API-key-like values, enforce length limits, and use literal (non-regex)
+product/department matching.
+
+The heavier model checks are optional. Install them with:
+
+```text
+uv pip install -e '.[guardrails]'
+```
+
+Enable them in `.env` only when the host has enough memory for the models:
+
+```text
+GUARDRAIL_ENABLE_DEBERTA=false
+GUARDRAIL_ENABLE_DETOXIFY=false
+GUARDRAIL_MAX_INPUT_LENGTH=200
+GUARDRAIL_INJECTION_THRESHOLD=0.85
+GUARDRAIL_TOXICITY_THRESHOLD=0.85
+```
+
+The first request downloads enabled Hugging Face models. Keep those model
+downloads outside production startup if deterministic deployment is required.
+
 The application can be run using below command
 ```
 uv run ./src/store-product-chat.py

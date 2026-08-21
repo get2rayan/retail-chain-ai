@@ -15,7 +15,9 @@ env/
 *.sln
 *.userprefs
 # notebook files
-notebooks/
+notebook/
 .claude/
 .gradio/
 .DS_Store
+# log files
+*.log
