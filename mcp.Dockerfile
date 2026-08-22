@@ -17,5 +17,7 @@ RUN useradd --create-home --shell /bin/bash app && \
     chown -R app:app /app
 USER app
 
+EXPOSE 8000
+
 # Default command to run the MCP server
 CMD ["uv", "run", "src/retail_chain_mcp.py"]
