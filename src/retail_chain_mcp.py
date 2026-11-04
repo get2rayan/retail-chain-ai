@@ -1,4 +1,5 @@
 import json
+import os
 import sys
 from mcp.server.fastmcp.server import FastMCP
 from utilities import StoreProducts
@@ -54,11 +55,11 @@ def main():
     # Only run test if not in MCP mode
     if len(sys.argv) > 1 and sys.argv[1] == "test":
         test()
+    elif os.getenv("MCP_TRANSPORT", "stdio").lower() == "stdio":
+        # Inspector launches the container as a stdio subprocess.
+        mcp.run(transport="stdio")
     else:
-        # Start MCP server without any print statements
-        # mcp.run(transport="stdio")
-        # mcp.run(transport="sse")
-
+        # Set MCP_TRANSPORT=http and publish port 8000 for HTTP clients.
         import uvicorn
         from starlette.middleware.cors import CORSMiddleware
 

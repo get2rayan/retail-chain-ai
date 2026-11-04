@@ -20,4 +20,4 @@ USER app
 EXPOSE 8000
 
 # Default command to run the MCP server
-CMD ["uv", "run", "src/retail_chain_mcp.py"]
+CMD ["/app/.venv/bin/python", "src/retail_chain_mcp.py"]
