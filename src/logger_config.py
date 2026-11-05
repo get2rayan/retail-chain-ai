@@ -26,7 +26,8 @@ def setup_logging(log_level=None, log_file='retail-chain.log', logger_name='reta
     formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt='%Y-%m-%d %H:%M:%S')
 
     # Create console handler and set level to debug
-    ch = logging.StreamHandler(sys.stdout)
+    # stdout is reserved for JSON-RPC when the MCP server uses stdio.
+    ch = logging.StreamHandler(sys.stderr)
     ch.setLevel(log_level)
     ch.setFormatter(formatter)
 
