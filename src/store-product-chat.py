@@ -17,11 +17,12 @@ class StoreProductChat:
     """
     def __init__(self):
         # Initialization
-        self.openai_api_key = os.getenv('OPENAI_API_KEY')
-        self.openai_model = os.getenv('OPENAI_MODEL')
+        self.inference_api_key = os.getenv('INFERENCE_API_KEY')
+        self.inference_model = os.getenv('INFERENCE_MODEL')
+        self.inference_base_url = os.getenv('INFERENCE_BASE_URL')
 
-        if not self.openai_api_key:
-            logger.warning("OpenAI API Key not set")
+        if not self.inference_api_key:
+            logger.warning("Inference API Key not set")
 
         self.setupAiTools()
 
@@ -48,6 +49,10 @@ class StoreProductChat:
                     "department": {
                         "type": "string",
                         "description": "The department in the store that the customer wants details about"
+                    },
+                    "promotion_only": {
+                        "type": "boolean",
+                        "description": "Whether to return only products currently on promotion"
                     }
                 },
                 "required": ["product_name", "store_id", "department"],
@@ -57,7 +62,7 @@ class StoreProductChat:
         self.tools = [{"type": "function", "function": products_tool}]
         self.tool_functions = { "get_store_products": StoreProducts().get_store_products }
 
-        self.MODEL =self.openai_model
+        self.MODEL =self.inference_model
         self.system_message="""You are a helpful assistant for a retail store ordering system.
         Customers may check with you for a list of available products in a store, their prices, availability or items that are in promotion at a store. Alternatively, they may also check for items in a specific department such as produce, deli etc.
         **Crucially, do not make any assumptions about products or stores unless explicitly specified by the user.**  If a product is not specified, do not substitute or guess a product; your tool calls should reflect the lack of product information.
@@ -66,7 +71,7 @@ class StoreProductChat:
         When making tool calls, ensure that the 'store', 'product' or 'department' fields are populated *only* if the user has explicitly provided that information.  **Do not fill these fields with default values or guesses.** Leave the fields empty (null or equivalent in your tool call structure) if the user has not provided the information.
         Give short, courteous, and accurate answers. If you don't know the answer or lack the necessary information from the user, say so politely.
         """
-        self.openai = OpenAI(api_key=self.openai_api_key)
+        self.openai = OpenAI(api_key=self.inference_api_key, base_url=self.inference_base_url)
         logger.debug(f"AI tools setup complete. Model: {self.MODEL}")
 
     def handle_tool_call(self, tool_calls):
@@ -122,7 +127,12 @@ class StoreProductChat:
 
         messages = [{"role": "system", "content": self.system_message}] + history
         logger.debug(f"\nchat messages to ai : {history}")
-        response = self.openai.chat.completions.create(model=self.MODEL, messages=messages, tools=self.tools, tool_choice="auto")
+        response = self.openai.chat.completions.create(
+            model=self.MODEL, 
+            messages=messages, 
+            tools=self.tools, 
+            tool_choice="auto",
+            reasoning_effort='none')
             
         tool_call_response=None
 

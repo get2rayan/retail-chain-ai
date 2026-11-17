@@ -48,7 +48,7 @@ class StoreProducts:
             pass
 
     
-    def get_store_products(self, product_name=None, store_id=None, department=None):
+    def get_store_products(self, product_name=None, store_id=None, department=None, promotion_only=False):
         """
         filter the store and product list for the specific product name
         
@@ -56,6 +56,7 @@ class StoreProducts:
         product_name: name of the product to look for in a store (if specified)
         store_id : integer representing a store (if specified)
         department: department in the store (if specified)
+        promotion_only: whether to return only products on promotion
         
         Returns:
         product details for the requested product as dictionary
@@ -73,6 +74,8 @@ class StoreProducts:
                     sp = sp.query(f'product.str.contains("{product_name}", case=False)', engine='python')
                 if department:
                     sp = sp.query(f'department.str.contains("{department}", case=False)', engine='python')
+                if promotion_only:
+                    sp = sp[sp['isinpromotion'].astype(str).str.upper() == 'Y']
                 return sp.to_dict('records')
             else:
                 return None

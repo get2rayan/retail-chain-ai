@@ -14,11 +14,13 @@ class PictureAgent:
     def __init__(self):
         # Initialization
         load_dotenv()
-        openai_api_key = os.getenv('OPENAI_API_KEY')
-        if not openai_api_key:
+        image_api_key = os.getenv('IMAGE_API_KEY')
+        image_base_url = os.getenv('IMAGE_BASE_URL')
+        self.image_model = os.getenv('IMAGE_MODEL')
+        if not image_api_key:
             logger.warning("OpenAI API Key not set")
 
-        self.openai = OpenAI(api_key=openai_api_key)
+        self.openai = OpenAI(api_key=image_api_key, base_url=image_base_url)
 
 
     def generateImage(self,content):
@@ -31,12 +33,12 @@ class PictureAgent:
         Returns:
         image content of the generated image
         """
-        prompt = f"""Generate a collage of product images for the following items only -  {', '.join(content)}.  The most important requirement is that *no product image should overlap any other* and show only the products mentioned.  \n
-                Each item must be clearly visible and distinct. Arrange the images in a clean and organized manner, with sufficient spacing between them.  \n
+        prompt = f"""Generate a collage of product images for the following items -  {', '.join(content)}.  The most important requirement is that *no product image should overlap any other* and show only the products mentioned.  \n
+                Each item must be clearly visible and distinct. Do not invent brand names, logos, prices, or readable label text. Arrange the images in a clean and organized manner, with sufficient spacing between them.  \n
                 The images should be high-quality and realistic, evoking the feeling of browsing in a store. The items should appear only once."""
         
         response=self.openai.images.generate(
-                model="gpt-image-1.5",
+                model=self.image_model,
                 prompt = prompt,
                 size="1024x1024",
                 n=1

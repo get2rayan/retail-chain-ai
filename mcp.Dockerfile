@@ -19,5 +19,8 @@ USER app
 
 EXPOSE 8000
 
+# A standalone container should serve HTTP instead of exiting when stdin closes.
+ENV MCP_TRANSPORT=http
+
 # Default command to run the MCP server
 CMD ["/app/.venv/bin/python", "src/retail_chain_mcp.py"]
