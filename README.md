@@ -65,6 +65,7 @@ Copy `.env.template` to `.env` and configure the provider settings:
 - `INFERENCE_BASE_URL`, `INFERENCE_API_KEY`, and `INFERENCE_MODEL` configure chat completions.
 - `IMAGE_BASE_URL`, `IMAGE_API_KEY`, and `IMAGE_MODEL` configure image generation.
 - `MCP_SERVER_URL` selects the Streamable HTTP MCP server used by `store-product-chat-mcp.py`.
+- `MCP_SERVER_API_KEY`, `MCP_SERVER_AUTH_HEADER`, and `MCP_SERVER_AUTH_SCHEME` configure gateway authentication for `spc-mcp-agent-aigw.py`. The defaults send `Authorization: Bearer <key>`; for a raw `api-key` header, set the header to `api-key` and the scheme to an empty value.
 - `STORE_PRODUCTS_FILE` selects the CSV file under `data/`.
 
 Keep real credentials in your local `.env`; do not commit it. The Dockerfile currently copies `.env` into the image at build time, so do not publish or share an image built with real credentials.
@@ -90,18 +91,27 @@ To run the Gradio chat that discovers and invokes tools from the configured MCP 
 uv run src/store-product-chat-mcp.py
 ```
 
-For an agent that discovers and selects MCP tools automatically with the OpenAI Agents SDK, start the MCP server and run:
+For an agent that discovers and selects tools automatically with the OpenAI Agents SDK, start the MCP server and run:
 
 ```text
 uv run src/spc-mcp-agent.py
 ```
 
-This agent uses `MCP_SERVER_URL` and the existing `INFERENCE_API_KEY`,
+This standard agent uses `MCP_SERVER_URL` and the existing `INFERENCE_API_KEY`,
 `INFERENCE_MODEL`, and optional `INFERENCE_BASE_URL` settings. It connects to
 the MCP server over Streamable HTTP and uses the configured chat-completions
 provider. Select **Image** in the agent options to generate a product collage
 from products returned by the MCP tools; this uses `IMAGE_API_KEY`,
 `IMAGE_BASE_URL`, and `IMAGE_MODEL`.
+
+For an MCP server protected by an API gateway, use the gateway-specific variant:
+
+```text
+uv run src/spc-mcp-agent-aigw.py
+```
+
+It uses `MCP_SERVER_API_KEY` and the optional `MCP_SERVER_AUTH_HEADER` and
+`MCP_SERVER_AUTH_SCHEME` settings to add authentication to MCP HTTP requests.
 
 <img src="resources/run.png">
 

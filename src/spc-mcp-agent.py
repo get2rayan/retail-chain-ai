@@ -4,10 +4,11 @@ import os
 from typing import Any
 
 import gradio as gr
-from agents import Agent, OpenAIChatCompletionsModel, Runner
+from agents import Agent, ModelSettings, OpenAIChatCompletionsModel, Runner
 from agents.mcp import MCPServerStreamableHttp
 from dotenv import load_dotenv
 from openai import AsyncOpenAI
+from openai.types.shared import Reasoning
 
 from PictureAgent import PictureAgent
 from guardrails import GuardrailViolation, sanitize_input
@@ -86,6 +87,7 @@ class StoreProductMcpAgent:
             name="Retail Store Assistant",
             instructions=INSTRUCTIONS,
             model=self.model,
+            model_settings=ModelSettings(reasoning=Reasoning.model_construct(effort="none")),
             mcp_servers=[server],
         )
 
