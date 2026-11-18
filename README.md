@@ -64,6 +64,7 @@ Copy `.env.template` to `.env` and configure the provider settings:
 
 - `INFERENCE_BASE_URL`, `INFERENCE_API_KEY`, and `INFERENCE_MODEL` configure chat completions.
 - `IMAGE_BASE_URL`, `IMAGE_API_KEY`, and `IMAGE_MODEL` configure image generation.
+- `MCP_SERVER_URL` selects the Streamable HTTP MCP server used by `store-product-chat-mcp.py`.
 - `STORE_PRODUCTS_FILE` selects the CSV file under `data/`.
 
 Keep real credentials in your local `.env`; do not commit it. The Dockerfile currently copies `.env` into the image at build time, so do not publish or share an image built with real credentials.
@@ -82,6 +83,12 @@ pip install -r requirements.txt
 python src/store-product-chat.py
 ```
 Navigate to the local `url` displayed and start chatting
+
+To run the Gradio chat that discovers and invokes tools from the configured MCP server, start that server first, then run:
+
+```text
+uv run src/store-product-chat-mcp.py
+```
 
 <img src="resources/run.png">
 
