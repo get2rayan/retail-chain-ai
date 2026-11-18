@@ -13,6 +13,7 @@ def get_store_product_info(
     product_name: str | None = None,
     store_id: int | None = None,
     department: str | None = None,
+    promotion_only: bool | None = False,
 ) -> str:
     """
     Retrieve store and product information for a given product and/or store, and/or department.
@@ -21,6 +22,7 @@ def get_store_product_info(
     product_name: Name of the product to search for (optional).
     store_id: ID of the store to search in (optional).
     department: Department within the store to search in (optional).
+    promotion_only: Whether to only include products with promotions (optional).
     """
     try:
         product_name, store_id, department = sanitize_search_inputs(product_name, store_id, department)
@@ -28,7 +30,7 @@ def get_store_product_info(
         logger.warning("Rejected MCP search request: %s", exc)
         return json.dumps({"error": str(exc)})
     sp = StoreProducts()
-    product_info = sp.get_store_products(product_name, store_id, department)
+    product_info = sp.get_store_products(product_name, store_id, department, promotion_only)
     return json.dumps({"product_info": product_info})
 
 @mcp.tool()
