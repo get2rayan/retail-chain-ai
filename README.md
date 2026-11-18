@@ -90,6 +90,19 @@ To run the Gradio chat that discovers and invokes tools from the configured MCP 
 uv run src/store-product-chat-mcp.py
 ```
 
+For an agent that discovers and selects MCP tools automatically with the OpenAI Agents SDK, start the MCP server and run:
+
+```text
+uv run src/spc-mcp-agent.py
+```
+
+This agent uses `MCP_SERVER_URL` and the existing `INFERENCE_API_KEY`,
+`INFERENCE_MODEL`, and optional `INFERENCE_BASE_URL` settings. It connects to
+the MCP server over Streamable HTTP and uses the configured chat-completions
+provider. Select **Image** in the agent options to generate a product collage
+from products returned by the MCP tools; this uses `IMAGE_API_KEY`,
+`IMAGE_BASE_URL`, and `IMAGE_MODEL`.
+
 <img src="resources/run.png">
 
 ## MCP Server in Docker
